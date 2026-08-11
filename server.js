@@ -1,15 +1,24 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors'; 
+import morgan from 'morgan'; 
 import router from './routes/index.js'; 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(cors()); 
+app.use(morgan('dev')); 
+app.use(express.json()); 
 
-// Mount router at /api
 app.use('/api', router);
+
+app.use((err, req, res, next) => {
+  console.error(err.message);
+  const status = err.status || 500;
+  res.status(status).json({ error: err.message });
+}); 
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-});
+}); 
