@@ -1,24 +1,20 @@
-import 'dotenv/config';
 import express from 'express';
-import cors from 'cors'; 
-import morgan from 'morgan'; 
-import router from './routes/index.js'; 
+import routes from './routes/index.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors()); 
-app.use(morgan('dev')); 
-app.use(express.json()); 
-
-app.use('/api', router);
+app.use(express.json());
+app.use('/api', routes);
 
 app.use((err, req, res, next) => {
-  console.error(err.message);
+  if (err.name === 'SequelizeValidationError') {
+    return res.status(400).json({ error: err.errors.map((e) => e.message) });
+  }
   const status = err.status || 500;
-  res.status(status).json({ error: err.message });
-}); 
+  res.status(status).json({ error: err.message || 'Internal Server Error' });
+});
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-}); 
+  console.log(`Server is running on port ${PORT}`);
+});

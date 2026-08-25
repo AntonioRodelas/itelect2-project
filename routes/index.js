@@ -1,93 +1,78 @@
 import express from 'express';
-import { fetchSampleUsers } from '../src/api.js'; 
-import { validateTask, mergeTaskUpdate } from '../src/utils.js'; // GT6 import[cite: 1, 4]
+import db from '../models/index.cjs';
 
+const { Task, User } = db;
 const router = express.Router();
 
-let tasks = [
-  { id: 1, title: 'Finish GT3', completed: true },
-  { id: 2, title: 'Finish GT4', completed: true },
-  { id: 3, title: 'Finish GT5', completed: false }
-]; 
-
-let nextId = 4; 
-let cachedUsers = []; 
-
-(async () => {
+router.get('/tasks', async (req, res, next) => {
   try {
-    cachedUsers = await fetchSampleUsers();
-    console.log('Users successfully fetched and cached.');
+    const tasks = await Task.findAll({
+      include: User,
+      order: [['id', 'ASC']]
+    });
+    res.json(tasks);
   } catch (error) {
-    console.error('Error caching sample users:', error.message);
+    next(error);
   }
-})(); 
-
-router.get('/tasks', (req, res) => {
-  res.json(tasks);
-}); 
-
-router.get('/tasks/:id', (req, res) => {
-  const taskId = req.params.id;
-  const task = tasks.find(t => String(t.id) === String(taskId));
-
-  if (!task) {
-    return res.status(404).json({ error: `Task with ID ${taskId} not found.` });
-  }
-
-  res.json(task);
-}); 
-
-router.get('/users', (req, res) => {
-  res.json(cachedUsers);
-}); 
-
-router.post('/tasks', (req, res, next) => {
-  
-  if (!validateTask(req.body)) {
-    const err = new Error('Task title and dueDate are required.');
-    err.status = 400;
-    return next(err); 
-  }
-
-  const newTask = {
-    id: nextId++,
-    completed: false,
-    ...req.body
-  };
-
-  tasks.push(newTask);
-  res.status(201).json(newTask); 
 });
 
-
-router.put('/tasks/:id', (req, res, next) => {
-  const taskId = Number(req.params.id);
-  const index = tasks.findIndex(t => t.id === taskId);
-
-  if (index === -1) {
-    const err = new Error(`Task with ID ${taskId} not found.`);
-    err.status = 404;
-    return next(err); 
+router.get('/tasks/:id', async (req, res, next) => {
+  try {
+    const task = await Task.findByPk(req.params.id, { include: User });
+    if (!task) {
+      return res.status(404).json({ error: `Task with ID ${req.params.id} not found.` });
+    }
+    res.json(task);
+  } catch (error) {
+    next(error);
   }
-
-
-  tasks[index] = mergeTaskUpdate(tasks[index], req.body);
-  res.status(200).json(tasks[index]); 
 });
 
-
-router.delete('/tasks/:id', (req, res, next) => {
-  const taskId = Number(req.params.id);
-  const index = tasks.findIndex(t => t.id === taskId);
-
-  if (index === -1) {
-    const err = new Error(`Task with ID ${taskId} not found.`);
-    err.status = 404;
-    return next(err); 
+router.get('/users', async (req, res, next) => {
+  try {
+    const users = await User.findAll({
+      include: Task,
+      order: [['id', 'ASC']]
+    });
+    res.json(users);
+  } catch (error) {
+    next(error);
   }
-
-  const [removed] = tasks.splice(index, 1);
-  res.status(200).json({ message: 'Task deleted successfully', task: removed }); 
 });
 
-export default router; 
+router.post('/tasks', async (req, res, next) => {
+  try {
+    const task = await Task.create(req.body);
+    res.status(201).json(task);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put('/tasks/:id', async (req, res, next) => {
+  try {
+    const task = await Task.findByPk(req.params.id);
+    if (!task) {
+      return res.status(404).json({ error: `Task with ID ${req.params.id} not found.` });
+    }
+    await task.update(req.body);
+    res.json(task);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete('/tasks/:id', async (req, res, next) => {
+  try {
+    const task = await Task.findByPk(req.params.id);
+    if (!task) {
+      return res.status(404).json({ error: `Task with ID ${req.params.id} not found.` });
+    }
+    await task.destroy();
+    res.json({ message: 'Task deleted successfully', task });
+  } catch (error) {
+    next(error);
+  }
+});
+
+export default router;

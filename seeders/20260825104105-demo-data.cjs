@@ -3,8 +3,8 @@
 const now = new Date();
 
 module.exports = {
-  async up(queryInterface, Sequelize) { 
-
+  async up(queryInterface, Sequelize) {
+    
     await queryInterface.bulkInsert('Users', [
       { name: 'Alice Smith', email: 'alice@example.com', createdAt: now, updatedAt: now },
       { name: 'Bob Jones', email: 'bob@example.com', createdAt: now, updatedAt: now }
