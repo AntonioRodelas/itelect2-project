@@ -1,8 +1,11 @@
 import express from 'express';
 import db from '../models/index.cjs';
+import authRouter from './auth.js';
 
 const { Task, User } = db;
 const router = express.Router();
+
+router.use('/auth', authRouter);
 
 router.get('/tasks', async (req, res, next) => {
   try {
