@@ -1,6 +1,8 @@
 import express from 'express';
 import db from '../models/index.cjs';
 import authRouter from './auth.js';
+import verifyToken from '../middleware/verifyToken.js';
+import requireRole from '../middleware/requireRole.js';
 
 const { Task, User } = db;
 const router = express.Router();
@@ -43,7 +45,8 @@ router.get('/users', async (req, res, next) => {
   }
 });
 
-router.post('/tasks', async (req, res, next) => {
+// Protected: Requires valid JWT token
+router.post('/tasks', verifyToken, async (req, res, next) => {
   try {
     const task = await Task.create(req.body);
     res.status(201).json(task);
@@ -52,7 +55,8 @@ router.post('/tasks', async (req, res, next) => {
   }
 });
 
-router.put('/tasks/:id', async (req, res, next) => {
+// Protected: Requires valid JWT token
+router.put('/tasks/:id', verifyToken, async (req, res, next) => {
   try {
     const task = await Task.findByPk(req.params.id);
     if (!task) {
@@ -65,7 +69,8 @@ router.put('/tasks/:id', async (req, res, next) => {
   }
 });
 
-router.delete('/tasks/:id', async (req, res, next) => {
+// Protected: Requires valid JWT token AND 'admin' role
+router.delete('/tasks/:id', verifyToken, requireRole('admin'), async (req, res, next) => {
   try {
     const task = await Task.findByPk(req.params.id);
     if (!task) {
