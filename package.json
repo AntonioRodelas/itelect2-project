@@ -4,7 +4,7 @@
   "description": "My IT Elective 2 backend web development project.\"# itelect2-project\" \r Antonio Joachim L. Rodelas\r IT3C\r October 19, 2005",
   "main": "index.js",
   "scripts": {
-    "start": "npx sequelize-cli db:migrate --env production && node server.js",
+    "start": "node node_modules/sequelize-cli/lib/sequelize db:migrate --env production && node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
