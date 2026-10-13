@@ -18,13 +18,16 @@ if (!secret || secret.length < 32) {
   process.exit(1);
 }
 
-// Database Connection & Table Sync Startup Check
+// Database Connection & Explicit Model Sync Startup Check
 try {
   await db.sequelize.authenticate();
   console.log('Database connection has been established successfully.');
   
-  // Automatically create or update tables based on your Sequelize models
-  await db.sequelize.sync();
+  // Ensure models are registered on db instance before syncing
+  const { Task, User } = db;
+  
+  // Automatically create tables if they do not exist
+  await db.sequelize.sync({ alter: true });
   console.log('Database tables synchronized successfully.');
 } catch (err) {
   console.error('Cannot reach or sync the database:', err.message);
