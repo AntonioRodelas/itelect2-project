@@ -4,8 +4,8 @@ Antonio Joachim L. Rodelas
 IT3C
 October 19, 2005
 
-## Live URL
-https://itelect2-project-rfy5.onrender.com
+## Live API URL
+[https://itelect2-project-1.onrender.com](https://itelect2-project-1.onrender.com)
 
 ## API Testing
 
