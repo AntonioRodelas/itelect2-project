@@ -5,7 +5,7 @@ const { Task, User } = db;
 export const getAllTasks = async (req, res, next) => {
   try {
     const tasks = await Task.findAll({
-      include: User,
+      include: User ? [{ model: User, attributes: ['id', 'email'] }] : [],
       order: [['id', 'ASC']],
     });
     res.json(tasks);
@@ -16,7 +16,9 @@ export const getAllTasks = async (req, res, next) => {
 
 export const getTaskById = async (req, res, next) => {
   try {
-    const task = await Task.findByPk(req.params.id, { include: User });
+    const task = await Task.findByPk(req.params.id, { 
+      include: User ? [{ model: User, attributes: ['id', 'email'] }] : [] 
+    });
     if (!task) {
       return res.status(404).json({ error: `Task with ID ${req.params.id} not found.` });
     }
