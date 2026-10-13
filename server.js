@@ -20,6 +20,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
 
+// Root route handler
+app.get('/', (req, res) => {
+  res.json({ message: 'IT Elective 2 API is running successfully' });
+});
+
 // Centralized Error Handling Middleware
 app.use(errorHandler);
 
