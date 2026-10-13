@@ -2,7 +2,10 @@
 My IT Elective 2 backend web development project."# itelect2-project" 
 Antonio Joachim L. Rodelas
 IT3C
-Octobur 19, 2005
+October 19, 2005
+
+## Live URL
+https://itelect2-project.onrender.com
 
 ## API Testing
 
