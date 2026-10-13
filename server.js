@@ -18,12 +18,16 @@ if (!secret || secret.length < 32) {
   process.exit(1);
 }
 
-// Database Connection Startup Check
+// Database Connection & Table Sync Startup Check
 try {
   await db.sequelize.authenticate();
   console.log('Database connection has been established successfully.');
+  
+  // Automatically create or update tables based on your Sequelize models
+  await db.sequelize.sync();
+  console.log('Database tables synchronized successfully.');
 } catch (err) {
-  console.error('Cannot reach the database:', err.message);
+  console.error('Cannot reach or sync the database:', err.message);
   process.exit(1);
 }
 
